@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Watermark Background color</title>
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    #canvas {
+      display: block;
+      width: 100vw;
+      height: 100vh;
+    }
+  </style>
+</head>
+
+<body>
+  <svg id="canvas" xmlns="http://www.w3.org/2000/svg"></svg>
+
+  <script>
+    //Иконки для фона
+    const ICON_SRC = [
+      "primogem.svg",
+      "stellar-jade.svg",
+      "polychrome.svg",
+      "oroberyl.svg"
+    ];
+
+    //Параметры расположения иконок
+    const BG = "#C4D9A3";  //цвет фона
+    const OPACITY = 0.35;  //прозраность иконки
+    const PER_ICON = 18;   //количество иконок каждого вида
+    const MIN_GAP = 25;    //минимальное расстояние между
+    const SAME_DIST = 280; //расстояние между иконками одного вида
+    const MARGIN = 50;     //отступ от края
+    const SCALE_RANGE = [0.65, 1.1]; //масштаб иконок
+    const MAX_ROT = 6;     // максимльный градус пворота иконки
+
+    const svg = document.getElementById("canvas");
+    const W = innerWidth, H = innerHeight;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    svg.style.background = BG;
+
+    //Размещение
+    const placed = [];
+
+    function fits(x, y, r, g) {
+      if (x - r < MARGIN || x + r > W - MARGIN ||
+        y - r < MARGIN || y + r > H - MARGIN) return false;
+      for (const p of placed) {
+        const d = Math.hypot(p.x - x, p.y - y);
+        if (d < p.r + r + MIN_GAP) return false;
+        if (p.g === g && d < SAME_DIST) return false;
+      }
+      return true;
+    }
+
+    //Список из иконок каждого вида, случайно перемешиваем
+    const queue = [];
+    for (let g = 0; g < 4; g++)
+      for (let i = 0; i < PER_ICON; i++) queue.push(g);
+    for (let i = queue.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [queue[i], queue[j]] = [queue[j], queue[i]];
+    }
+
+    let attempts = 0;
+    for (const g of queue) {
+      let ok = false;
+      while (!ok && attempts < 500000) {
+        attempts++;
+        const scale = SCALE_RANGE[0] +
+          Math.random() * (SCALE_RANGE[1] - SCALE_RANGE[0]);
+        const size = 100 * scale;
+        const r = size * 0.72; 
+        const x = MARGIN + Math.random() * (W - 2 * MARGIN);
+        const y = MARGIN + Math.random() * (H - 2 * MARGIN);
+        if (fits(x, y, r, g)) {
+          placed.push({x, y, r, g});
+          const rot = Math.random() * 2 * MAX_ROT - MAX_ROT;
+          const el = document.createElementNS("http://www.w3.org/2000/svg", "image");
+          el.setAttribute("href", ICON_SRC[g]);
+          el.setAttribute("x", x - size / 2);
+          el.setAttribute("y", y - size / 2);
+          el.setAttribute("width", size);
+          el.setAttribute("height", size);
+          el.setAttribute("opacity", OPACITY);
+          el.setAttribute("transform", `rotate(${rot} ${x} ${y})`);
+          svg.appendChild(el);
+          ok = true;
+        }
+      }
+    }
+  </script>
+</body>
+
+</html>
