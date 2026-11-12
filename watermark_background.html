@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Watermark Background</title>
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    #canvas {
+      display: block;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    #toolbar {
+      position: fixed;
+      bottom: 16px;
+      right: 16px;
+      display: flex;
+      gap: 8px;
+    }
+
+    #toolbar button {
+      font: 13px/1 sans-serif;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background: #6F8757;
+      color: #fff;
+      opacity: 0.85;
+    }
+
+    #toolbar button:hover {
+      opacity: 1;
+    }
+  </style>
+</head>
+
+<body>
+  <svg id="canvas" xmlns="http://www.w3.org/2000/svg">
+
+    <defs>
+      <filter id="sage" x="-2%" y="-2%" width="104%" height="104%" color-interpolation-filters="sRGB">
+        <feColorMatrix type="saturate" values="0" />
+        <feComponentTransfer>
+          <feFuncR type="linear" slope="0.6" intercept="0.2" />
+          <feFuncG type="linear" slope="0.6" intercept="0.2" />
+          <feFuncB type="linear" slope="0.6" intercept="0.2" />
+        </feComponentTransfer>
+        <feColorMatrix type="matrix" values="
+                0.3725 0      0      0 0
+                0      0.6588 0      0 0
+                0      0      0.2471 0 0
+                0      0      0      1 0" />
+      </filter>
+    </defs>
+  </svg>
+  <div id="toolbar">
+    <button id="btnRegen">↻ Retry</button>
+    <button id="btnToggle">Режим: водяные знаки</button>
+    <!--
+    <button onclick="exportSVG()">↓ Download SVG</button>
+    -->
+  </div>
+  <script src="config.js"></script>
+  <script src="main.js"></script>
+
+
+
+</body>
+
+</html>
